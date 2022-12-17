@@ -1,0 +1,328 @@
+import datetime
+
+class Vehicle:
+  def __init__(self, make, model, year, price, mileage=0, id=None):
+    self.make = make
+    self.model = model
+    self.year = year
+    self.price = price
+    self.mileage = mileage
+    self.id = id or self.generate_id()
+  
+  def __str__(self):
+    return f'{self.year} {self.make} {self.model} ({self.mileage} miles, ID: {self.id})'
+  
+  def generate_id(self):
+    # generate a unique ID for the vehicle
+    pass
+
+class Car(Vehicle):
+  def __init__(self, make, model, year, price, mileage=0, doors=4, id=None):
+    super().__init__(make, model, year, price, mileage, id)
+    self.doors = doors
+  
+  def __str__(self):
+    return f'{self.year} {self.make} {self.model} ({self.mileage} miles, {self.doors} doors, ID: {self.id})'
+
+class Truck(Vehicle):
+  def __init__(self, make, model, year, price, mileage=0, bed_size='standard', id=None):
+    super().__init__(make, model, year, price, mileage, id)
+    self.bed_size = bed_size
+  
+  def __str__(self):
+    return f'{self.year} {self.make} {self.model} ({self.mileage} miles, {self.bed_size} bed, ID: {self.id})'
+
+class Dealer:
+  def __init__(self, name, inventory=[]):
+    self.name = name
+    self.inventory = inventory
+  
+  def __str__(self):
+    return self.name
+  
+  def add_vehicle(self, vehicle):
+    self.inventory.append(vehicle)
+  
+  def remove_vehicle(self, vehicle):
+    self.inventory.remove(vehicle)
+  
+  def get_inventory(self):
+    return self.inventory
+
+class Customer:
+  def __init__(self, name, funds):
+    self.name = name
+    self.funds = funds
+  
+  def __str__(self):
+    return self.name
+  
+  def make_offer(self, vehicle, offer):
+    if offer >= vehicle.price:
+      return True
+    return False
+
+class SalesPerson:
+  def __init__(self, name):
+    self.name = name
+  
+  def __str__(self):
+    return self.name
+  
+  def make_sale(self, customer, vehicle, offer):
+    if customer.make_offer(vehicle, offer):
+      print(f'{customer} has made a successful offer of ${offer} for the {vehicle}')
+      return True
+    print(f'{customer} has made an unsuccessful offer of ${offer} for the {vehicle}')
+    return False
+
+def main():
+   dealer = Dealer('Acme Auto Sales')
+  salesperson = SalesPerson('Sue Smith')
+
+  # add some vehicles to the dealer's inventory
+  dealer.add_vehicle(Car('Ford', 'Mustang', 2020, 35000))
+  dealer.add_vehicle(Truck('Chevrolet', 'Silverado', 2019, 30000))
+  dealer.add_vehicle(Car('Honda', 'Accord', 2018, 25000, mileage=30000))
+  dealer.add_vehicle(Truck('Toyota', 'Tacoma', 2020, 40000, bed_size='long'))
+
+  while True:
+    print('Welcome to the vehicle dealership')
+    print('Enter 1 to browse the inventory')
+    print('Enter 2 to make an offer on a vehicle')
+    print('Enter 3 to view past transactions')
+    print('Enter 4 to exit')
+    choice = input('Enter your selection: ')
+
+    if choice == '1':
+      inventory = dealer.get_inventory()
+      print(f'{dealer} has the following vehicles in stock:')
+      for vehicle in inventory:
+        print(vehicle)
+
+    elif choice == '2':
+      vehicle_id = input('Enter the ID of the vehicle you want to purchase: ')
+      try:
+        vehicle = find_vehicle_by_id(vehicle_id, dealer.get_inventory())
+      except ValueError as e:
+        print(e)
+        continue
+      customer_name = input('Enter your name: ')
+      funds = int(input('Enter your available funds: '))
+      customer = Customer(customer_name, funds)
+      offer = int(input(f'Enter your offer for the {vehicle}: '))
+      if salesperson.make_sale(customer, vehicle, offer):
+        dealer.remove_vehicle(vehicle)
+        transaction = Transaction(customer, salesperson, vehicle, offer, datetime.datetime.now())
+        transactions.append(transaction)
+      else:
+        print('The offer was not accepted')
+
+    elif choice == '3':
+      for transaction in transactions:
+        print(transaction)
+    
+    elif choice == '4':
+      break
+    else:
+      print('Invalid selection')
+
+def find_vehicle_by_id(vehicle_id, inventory):
+  for vehicle in inventory:
+    if vehicle.id == vehicle_id:
+      return vehicle
+  raise ValueError('Vehicle not found')
+
+class Transaction:
+  def __init__(self, customer, salesperson, vehicle, price, date):
+    self.customer = customer
+    self.salesperson = salesperson
+    self.vehicle = vehicle
+    self.price = price
+    self.date = date
+  
+  def __str__(self):
+    return f'{self.customer} purchased a {self.vehicle} from {self.salesperson} for ${self.price} on {self.date:%m/%d/%Y}'
+
+if __name__ == '__main__':
+  main()
+
+import requests
+
+class PaymentGateway:
+  def __init__(self, api_key):
+    self.api_key = api_key
+
+  def charge(self, customer, amount):
+    # use the Payment Gateway API to charge the customer's credit card or debit their bank account
+    pass
+
+class CreditCard:
+  def __init__(self, number, expiry_month, expiry_year, cvv):
+    self.number = number
+    self.expiry_month = expiry_month
+    self.expiry_year = expiry_year
+    self.cvv = cvv
+
+class BankAccount:
+  def __init__(self, routing_number, account_number):
+    self.routing_number = routing_number
+    self.account_number = account_number
+
+class Payment:
+  def __init__(self, payment_gateway, payment_info):
+    self.payment_gateway = payment_gateway
+    if isinstance(payment_info, CreditCard):
+      self.payment_type = 'credit_card'
+      self.credit_card = payment_info
+    elif isinstance(payment_info, BankAccount):
+      self.payment_type = 'bank_account'
+      self.bank_account = payment_info
+    else:
+      raise ValueError('Invalid payment info')
+  
+  def charge(self, amount):
+    if self.payment_type == 'credit_card':
+      self.payment_gateway.charge(self.credit_card, amount)
+    elif self.payment_type == 'bank_account':
+      self.payment_gateway.charge(self.bank_account, amount)
+  
+  def refund(self, amount):
+    # use the Payment Gateway API to refund the payment
+    pass
+def search_inventory(dealer, make=None, model=None, year=None, price_range=None):
+  inventory = dealer.get_inventory()
+  search_results = []
+  for vehicle in inventory:
+    if make and make != vehicle.make:
+      continue
+    if model and model != vehicle.model:
+      continue
+    if year and year != vehicle.year:
+      continue
+    if price_range and (vehicle.price < price_range[0] or vehicle.price > price_range[1]):
+      continue
+    search_results.append(vehicle)
+  return search_results
+
+def main():
+  # ...
+  elif choice == '1':
+    make = input('Enter the make of the vehicle (optional): ')
+    model = input('Enter the model of the vehicle (optional): ')
+    year = input('Enter the year of the vehicle (optional): ')
+    price_range = input('Enter a price range in the format "low-high" (optional): ').split('-')
+    if price_range:
+      price_range = [int(price_range[0]), int(price_range[1])]
+    search_results = search_inventory(deal
+class Financing:
+  def __init__(self, down_payment, term, interest_rate):
+    self.down_payment = down_payment
+    self.term = term
+    self.interest_rate = interest_rate
+  
+  def calculate_monthly_payment(self, price):
+    # use a financing formula to calculate the monthly payment
+    pass
+
+class Customer:
+  # ...
+  def make_offer(self, vehicle, offer, financing=None):
+    if financing:
+      monthly_payment = financing.calculate_monthly_payment(vehicle.price)
+      if monthly_payment > self.funds:
+        raise ValueError('Insufficient funds for financing')
+    # ...
+
+def main():
+  # ...
+  elif choice == '2':
+    # ...
+    financing = None
+    financing_choice = input('Would you like to finance this purchase (y/n)? ')
+    if financing_choice == 'y':
+      down_payment = int(input('Enter the down payment amount: '))
+      term = int(input('Enter the financing term in months: '))
+      interest_rate = float(input('Enter the interest rate: '))
+      financing = Financing(down_payment, term, interest_rate)
+    if salesperson.make_sale(customer, vehicle, offer, financing=financing):
+      # ...
+class TradeIn:
+  def __init__(self, vehicle, value):
+    self.vehicle = vehicle
+    self.value = value
+
+class Customer:
+  # ...
+  def make_offer(self, vehicle, offer, financing=None, trade_in=None):
+    if trade_in:
+      self.funds += trade_in.value
+    # ...
+
+def main():
+  # ...
+  elif choice == '2':
+    # ...
+    trade_in = None
+    trade_in_choice = input('Do you have a vehicle to trade in (y/n)? ')
+    if trade_in_choice == 'y':
+      make = input('Enter the make of the trade-in vehicle: ')
+      model = input('Enter the model: ')
+      class Customer:
+  # ...
+  def __init__(self, name, funds, loyalty_points=0):
+    self.name = name
+    self.funds = funds
+    self.loyalty_points = loyalty_points
+  
+  def add_loyalty_points(self, points):
+    self.loyalty_points += points
+
+class SalesPerson:
+  # ...
+  def make_sale(self, customer, vehicle, offer, financing=None, trade_in=None):
+    # ...
+    customer.add_loyalty_points(100)
+    return True
+
+def main():
+  # ...
+  elif choice == '2':
+    # ...
+    loyalty_discount = 0
+    if customer.loyalty_points >= 1000:
+      loyalty_discount = vehicle.price * 0.1
+      offer -= loyalty_discount
+    if salesperson.make_sale(customer, vehicle, offer, financing=financing, trade_in=trade_in):
+      # ...
+class VehicleHistoryReport:
+  def __init__(self, previous_owners, service_history, accident_reports):
+    self.previous_owners = previous_owners
+    self.service_history = service_history
+    self.accident_reports = accident_reports
+
+class Vehicle:
+  # ...
+  def get_history_report(self):
+    # use a Vehicle History Report API to retrieve the report
+    pass
+
+def main():
+  # ...
+  elif choice == '3':
+    vin = input('Enter the VIN of the vehicle: ')
+    vehicle = dealer.get_vehicle(vin)
+    if not vehicle:
+      print('Vehicle not found')
+      continue
+    report = vehicle.get_history_report()
+    print('Previous Owners:')
+    for owner in report.previous_owners:
+      print(f'- {owner}')
+    print('\nService History:')
+    for service in report.service_history:
+      print(f'- {service.date}: {service.description}')
+    print('\nAccident Reports:')
+    for accident in report.accident_reports:
+      print(f'- {accident.date}: {accident.description}')
+
