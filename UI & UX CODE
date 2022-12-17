@@ -1,0 +1,55 @@
+import tkinter as tk
+import tkinter.messagebox as messagebox
+
+from hotel_management_system import HotelChain, Hotel, Room, Reservation, Payment, Financing, Warranty, TradeIn, Customer
+
+class MainWindow(tk.Tk):
+  def __init__(self):
+    super().__init__()
+    self.title('Hotel Management System')
+    self.geometry('800x600')
+    self.resizable(False, False)
+    
+    self.hotel_chain = HotelChain()
+    
+    self.main_frame = tk.Frame(self)
+    self.main_frame.pack()
+    
+    self.search_frame = tk.Frame(self.main_frame)
+    self.search_frame.pack(side='top', fill='x')
+    
+    self.check_in_label = tk.Label(self.search_frame, text='Check-in Date:')
+    self.check_in_label.pack(side='left')
+    self.check_in_entry = tk.Entry(self.search_frame)
+    self.check_in_entry.pack(side='left')
+    
+    self.check_out_label = tk.Label(self.search_frame, text='Check-out Date:')
+    self.check_out_label.pack(side='left')
+    self.check_out_entry = tk.Entry(self.search_frame)
+    self.check_out_entry.pack(side='left')
+    
+    self.room_type_label = tk.Label(self.search_frame, text='Room Type:')
+    self.room_type_label.pack(side='left')
+    self.room_type_entry = tk.Entry(self.search_frame)
+    self.room_type_entry.pack(side='left')
+    
+    self.price_range_label = tk.Label(self.search_frame, text='Price Range:')
+    self.price_range_label.pack(side='left')
+    self.price_range_entry = tk.Entry(self.search_frame)
+    self.price_range_entry.pack(side='left')
+    
+    self.search_button = tk.Button(self.search_frame, text='Search', command=self.search)
+    self.search_button.pack(side='left')
+    
+    self.results_frame = tk.Frame(self.main_frame)
+    self.results_frame.pack(side='top', fill='both', expand=True)
+    
+    self.results_tree = tk.ttk.Treeview(self.results_frame, columns=('hotel', 'room_type', 'price'))
+    self.results_tree.heading('hotel', text='Hotel')
+    self.results_tree.heading('room_type', text='Room Type')
+    self.results_tree.heading('price', text='Price')
+    self.results_tree.pack(side='left', fill='both', expand=True)
+    
+    self.scrollbar = tk.Scrollbar(self.results_frame, orient='vertical', command=self.results_tree.yview)
+    self.scrollbar.pack(side='right', fill='y')
+    self.results_tree.configure(yscrollcommand=self.scrollbar.set)
